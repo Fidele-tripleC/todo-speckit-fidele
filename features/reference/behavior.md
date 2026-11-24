@@ -1,6 +1,6 @@
 # Behavior & Rules Reference
 
-**Status:** Feature 1 authentication, Feature 2 list rules, and Feature 3 todo rules.
+**Status:** Feature 1 authentication, Feature 2 list rules, Feature 3 todo rules, and Feature 4 profile rules.
 
 | Rule | Enforcement | Provenance |
 |------|-------------|------------|
@@ -20,9 +20,14 @@
 | Signed-in users who open login or register are sent to home | `router.beforeEach` | Feature 1 |
 | Users without a session who open a protected route are sent to login | `router.beforeEach` | Feature 1 |
 | Session is stored in `localStorage` under `user` | Login and register views | Feature 1 |
-| Sign out clears the server token, removes `user`, and opens login | `POST /todo/logout`, `logoutUser`, and `MenuBar` | Feature 1, Feature 2 |
+| Sign out clears the server token, removes `user`, and opens login | `POST /todo/logout` and `logoutUser` | Feature 1, Feature 4 |
+| `MenuBar` shows a user icon. The profile menu shows the name, username, email, **Edit Profile**, and **Log out**. There is no **Sign out** button on the bar | `MenuBar.vue` | Feature 4, FR-008 |
+| A user can read and update only their own profile. Another user's id returns `404` | `getAccessibleUserOrNull` | Feature 4, FR-002, FR-003 |
+| Profile names, email, and username are trimmed. Username is stored lowercase. Password is optional and hashed when provided | `user.controller.update` | Feature 4, FR-004, FR-005, FR-006 |
+| Profile responses never include the password hash | User default scope | Feature 4, FR-007 |
+| Edit Profile uses the shared `emailRules` | `MenuBar.vue` | Feature 4, FR-009 |
 | The dashboard is one lists view titled **My Lists**, with **+ New List**, edit, and delete dialogs | `Dashboard.vue` | Feature 2 |
-| `MenuBar` shows the signed-in user's name and **Sign out**, and is hidden on login and register | `App.vue`, `MenuBar.vue` | Feature 2 |
+| `MenuBar` is hidden on login and register | `App.vue` | Feature 2 |
 | List names are trimmed; empty names are rejected; names longer than 100 characters are rejected | Create and rename validation | Feature 2, FR-005 |
 | Lists are returned in alphabetical order by name | `GET /todo/lists` `order` | Feature 2, FR-006 |
 | A list belongs to one user. `userId` comes from the session, never the request body | `list.controller.create` | Feature 2, FR-002, FR-004 |
@@ -44,3 +49,4 @@
 | Authentication, session, route guards | Feature 1 |
 | Private todo lists and dashboard | Feature 2 |
 | Todo items inside an owned list | Feature 3 |
+| Profile menu and self-only profile update | Feature 4 |

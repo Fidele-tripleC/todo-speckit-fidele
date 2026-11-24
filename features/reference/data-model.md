@@ -1,6 +1,6 @@
 # Data Model Reference
 
-**Status:** Feature 1 users and sessions. Feature 2 lists. Feature 3 todos.
+**Status:** Feature 1 users and sessions. Feature 2 lists. Feature 3 todos. Feature 4 edits the existing `users` row.
 
 ## Tables
 
@@ -14,7 +14,7 @@
 | `email` | STRING | Required, unique |
 | `username` | STRING(100) | Required, unique; stored lowercase |
 | `password` | STRING(255) | Required; bcrypt hash only; excluded from the default scope |
-| `role` | STRING(20) | Required; default `worker` |
+| `role` | STRING(20) | Required; default `worker`; not changed by profile update |
 
 ### `sessions`
 
@@ -66,3 +66,4 @@
 | `users`, `sessions` | Feature 1 |
 | `lists` | Feature 2 |
 | `todos` | Feature 3 |
+| Profile edits on `users` (no new table) | Feature 4 |

@@ -32,3 +32,4 @@ They do **not** authorize new scope — implement only from `features/feature-*.
 | Users, sessions, register/login/logout, route guards | Feature 1 |
 | Lists and the dashboard lists view | Feature 2 |
 | Todos and the list-items dialog | Feature 3 |
+| Profile menu and `GET`/`PUT /todo/users/:id` | Feature 4 |
