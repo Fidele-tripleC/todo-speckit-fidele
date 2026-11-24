@@ -9,11 +9,18 @@ export const syncTestDatabase = async () => {
 };
 
 export const resetTestDatabase = async () => {
+  if (db.todo) {
+    await db.todo.destroy({ where: {} });
+  }
   if (db.list) {
     await db.list.destroy({ where: {} });
   }
   await db.session.destroy({ where: {} });
   await db.user.destroy({ where: {} });
+};
+
+export const createTodo = async (authHeader, listId, title) => {
+  return request(app).post(`/todo/lists/${listId}/todos`).set(authHeader).send({ title });
 };
 
 export const createList = async (authHeader, name) => {

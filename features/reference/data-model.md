@@ -1,6 +1,6 @@
 # Data Model Reference
 
-**Status:** Feature 1 users and sessions. Feature 2 lists.
+**Status:** Feature 1 users and sessions. Feature 2 lists. Feature 3 todos.
 
 ## Tables
 
@@ -36,12 +36,28 @@
 | `createdAt` | DATE | Sequelize timestamp |
 | `updatedAt` | DATE | Sequelize timestamp |
 
+### `todos`
+
+| Field | Type | Rules |
+|-------|------|-------|
+| `id` | INTEGER PK | Auto-increment |
+| `listId` | INTEGER FK | Required; references `lists.id`; list delete cascades |
+| `title` | STRING(255) | Required; trimmed; max 255 characters |
+| `completed` | BOOLEAN | Required; default `false` |
+| `userId` | INTEGER FK | Required; references `users.id`; set from the signed-in user on create |
+| `createdAt` | DATE | Sequelize timestamp |
+| `updatedAt` | DATE | Sequelize timestamp |
+
 ## Associations
 
 - `users` has many `sessions` (`userId`, delete cascades).
 - `sessions` belongs to `users`.
 - `users` has many `lists` (`userId`, delete cascades).
 - `lists` belongs to `users`.
+- `lists` has many `todos` (`listId`, delete cascades).
+- `todos` belongs to `lists`.
+- `users` has many `todos` (`userId`, delete cascades).
+- `todos` belongs to `users`.
 
 ## Feature provenance
 
@@ -49,3 +65,4 @@
 |------|------------|
 | `users`, `sessions` | Feature 1 |
 | `lists` | Feature 2 |
+| `todos` | Feature 3 |

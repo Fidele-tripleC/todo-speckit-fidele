@@ -1,6 +1,6 @@
 # Behavior & Rules Reference
 
-**Status:** Feature 1 authentication and Feature 2 list rules.
+**Status:** Feature 1 authentication, Feature 2 list rules, and Feature 3 todo rules.
 
 | Rule | Enforcement | Provenance |
 |------|-------------|------------|
@@ -28,6 +28,14 @@
 | A list belongs to one user. `userId` comes from the session, never the request body | `list.controller.create` | Feature 2, FR-002, FR-004 |
 | Reads, renames, and deletes include `userId: req.user.id`. Another user's list returns `404` | `getAccessibleListOrNull` | Feature 2, FR-003 |
 | An empty list collection shows "No lists yet. Create your first list." | `Dashboard.vue` | Feature 2 |
+| Each list row has an **Items** action that opens a dialog for that list only | `Dashboard.vue` | Feature 3, FR-010 |
+| **+ Add Item** is inside the items dialog. An empty list shows "No todos in this list yet." | `Dashboard.vue` | Feature 3 |
+| Todo titles are trimmed; empty titles are rejected; titles longer than 255 characters are rejected | Create and edit validation | Feature 3, FR-006 |
+| A new todo belongs to the opened list and the signed-in user, and starts incomplete | `todo.controller.create` | Feature 3, FR-002, FR-005, FR-007 |
+| Todos are returned incomplete first, then by `createdAt` ascending | `GET /todo/lists/:listId/todos` | Feature 3, FR-009 |
+| Todo reads, updates, and deletes match `userId: req.user.id`. Another user's list or todo returns `404` | `getAccessibleListOrNull`, `getAccessibleTodoOrNull` | Feature 3, FR-003, FR-004 |
+| Deleting a list deletes its todos | `lists` `hasMany` `todos` `onDelete: CASCADE` | Feature 3, FR-008 |
+| A completed todo title is struck through | `Dashboard.vue` | Feature 3 |
 
 ## Feature provenance
 
@@ -35,3 +43,4 @@
 |------|------------|
 | Authentication, session, route guards | Feature 1 |
 | Private todo lists and dashboard | Feature 2 |
+| Todo items inside an owned list | Feature 3 |
