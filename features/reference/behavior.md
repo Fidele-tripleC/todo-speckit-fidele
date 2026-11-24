@@ -1,6 +1,6 @@
 # Behavior & Rules Reference
 
-**Status:** Feature 1 authentication rules.
+**Status:** Feature 1 authentication and Feature 2 list rules.
 
 | Rule | Enforcement | Provenance |
 |------|-------------|------------|
@@ -20,12 +20,18 @@
 | Signed-in users who open login or register are sent to home | `router.beforeEach` | Feature 1 |
 | Users without a session who open a protected route are sent to login | `router.beforeEach` | Feature 1 |
 | Session is stored in `localStorage` under `user` | Login and register views | Feature 1 |
-| Sign out clears the server token, removes `user`, and opens login | `POST /todo/logout` and `logoutUser` | Feature 1 |
-| Home shows the user's first name and a Sign out button; no menu bar | `Home.vue` | Feature 1 |
-| `GET /todo/lists` is authenticated and returns only the caller's lists. No list rows exist yet, so the body is `[]` | `list.controller.findAll` | Feature 1, US-1.3 |
+| Sign out clears the server token, removes `user`, and opens login | `POST /todo/logout`, `logoutUser`, and `MenuBar` | Feature 1, Feature 2 |
+| The dashboard is one lists view titled **My Lists**, with **+ New List**, edit, and delete dialogs | `Dashboard.vue` | Feature 2 |
+| `MenuBar` shows the signed-in user's name and **Sign out**, and is hidden on login and register | `App.vue`, `MenuBar.vue` | Feature 2 |
+| List names are trimmed; empty names are rejected; names longer than 100 characters are rejected | Create and rename validation | Feature 2, FR-005 |
+| Lists are returned in alphabetical order by name | `GET /todo/lists` `order` | Feature 2, FR-006 |
+| A list belongs to one user. `userId` comes from the session, never the request body | `list.controller.create` | Feature 2, FR-002, FR-004 |
+| Reads, renames, and deletes include `userId: req.user.id`. Another user's list returns `404` | `getAccessibleListOrNull` | Feature 2, FR-003 |
+| An empty list collection shows "No lists yet. Create your first list." | `Dashboard.vue` | Feature 2 |
 
 ## Feature provenance
 
 | Area | Introduced |
 |------|------------|
 | Authentication, session, route guards | Feature 1 |
+| Private todo lists and dashboard | Feature 2 |

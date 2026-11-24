@@ -30,3 +30,4 @@ They do **not** authorize new scope — implement only from `features/feature-*.
 | Area | Introduced |
 |------|------------|
 | Users, sessions, register/login/logout, route guards | Feature 1 |
+| Lists and the dashboard lists view | Feature 2 |
