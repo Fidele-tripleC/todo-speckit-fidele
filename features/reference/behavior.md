@@ -1,6 +1,6 @@
 # Behavior & Rules Reference
 
-**Status:** Feature 1 authentication, Feature 2 list rules, Feature 3 todo rules, and Feature 4 profile rules.
+**Status:** Feature 1 authentication through Feature 5 due dates.
 
 | Rule | Enforcement | Provenance |
 |------|-------------|------------|
@@ -41,6 +41,8 @@
 | Todo reads, updates, and deletes match `userId: req.user.id`. Another user's list or todo returns `404` | `getAccessibleListOrNull`, `getAccessibleTodoOrNull` | Feature 3, FR-003, FR-004 |
 | Deleting a list deletes its todos | `lists` `hasMany` `todos` `onDelete: CASCADE` | Feature 3, FR-008 |
 | A completed todo title is struck through | `Dashboard.vue` | Feature 3 |
+| `dueDate` is an optional calendar date. Invalid values return `400`. `null` clears it. Omitting it on update leaves it unchanged | `parseDueDateInput` | Feature 5, FR-002, FR-004, FR-005, FR-006 |
+| A set due date is shown as "Due" plus a readable date. An incomplete todo before today uses error styling. A completed todo does not | `Dashboard.vue`, `isTodoOverdue` | Feature 5, FR-008 |
 
 ## Feature provenance
 
@@ -50,3 +52,4 @@
 | Private todo lists and dashboard | Feature 2 |
 | Todo items inside an owned list | Feature 3 |
 | Profile menu and self-only profile update | Feature 4 |
+| Optional todo due dates and overdue styling | Feature 5 |

@@ -1,6 +1,6 @@
 # API Reference
 
-**Status:** Feature 1 authentication, Feature 2 private lists, Feature 3 private todos, and Feature 4 profile.
+**Status:** Feature 1 authentication, Feature 2 private lists, Feature 3 private todos, Feature 4 profile, and Feature 5 due dates.
 
 Base path: `/todo/`.
 
@@ -40,7 +40,7 @@ List success body:
 
 `GET /todo/lists` returns an array of those objects. Another user's list is omitted. Rename or delete of a list the caller does not own returns `404` with `{ "message": "List with id=<id> not found." }`. Deleting a list also deletes its todos.
 
-`POST /todo/lists/:listId/todos` accepts `{ "title": "Buy milk" }`. A `userId` in the body is ignored. The parent list must belong to the caller, or the response is `404` with `{ "message": "List with id=<id> not found." }`. The saved todo uses `userId` from the session and `listId` from the owned list. New todos start with `completed: false`.
+`POST /todo/lists/:listId/todos` accepts `{ "title": "Buy milk", "dueDate": "2026-07-15" }`. `dueDate` is optional. Omit it or send `null` for no due date. A `userId` in the body is ignored. The parent list must belong to the caller, or the response is `404` with `{ "message": "List with id=<id> not found." }`. The saved todo uses `userId` from the session and `listId` from the owned list. New todos start with `completed: false`. An invalid date returns `400` with `{ "message": "Due date must be a valid date in YYYY-MM-DD format." }`.
 
 Todo success body (`201` on create, `200` on update):
 
@@ -50,13 +50,14 @@ Todo success body (`201` on create, `200` on update):
   "listId": 1,
   "title": "Buy milk",
   "completed": false,
+  "dueDate": "2026-07-15",
   "userId": 42,
   "createdAt": "2026-07-02T12:05:00.000Z",
   "updatedAt": "2026-07-02T12:05:00.000Z"
 }
 ```
 
-`GET /todo/lists/:listId/todos` returns that user's todos for the list, incomplete first, then oldest `createdAt` first. `PUT /todo/todos/:id` accepts `title` and/or `completed`. A missing or unowned todo returns `404` with `{ "message": "Todo with id=<id> not found." }`. Delete returns `200` with `{ "message": "Todo deleted successfully." }`.
+`GET /todo/lists/:listId/todos` returns that user's todos for the list, incomplete first, then oldest `createdAt` first. Each todo includes `dueDate`, which is `null` when unset. `PUT /todo/todos/:id` accepts `title`, `completed`, and/or `dueDate`. Omitting `dueDate` leaves the stored date unchanged. Sending `dueDate: null` clears it. A missing or unowned todo returns `404` with `{ "message": "Todo with id=<id> not found." }`. Delete returns `200` with `{ "message": "Todo deleted successfully." }`.
 
 `GET /todo/users/:id` and `PUT /todo/users/:id` succeed only when `:id` is the signed-in user. Another user's id returns `404` with `{ "message": "User with id=<id> not found." }`. The profile response never includes `password`. Update body is `{ "fName", "lName", "email", "username", "password?" }`. `password` is optional; when sent it must be at least 8 characters and is stored as a bcrypt hash. Username is stored lowercase. Role is not changed.
 
@@ -101,6 +102,7 @@ The password hash is never included.
 | Todo title longer than 255 characters | `400` | `Todo title must be 255 characters or fewer.` |
 | Invalid todo id | `400` | `Invalid todo id.` |
 | Todo missing or owned by someone else | `404` | `Todo with id=<id> not found.` |
+| Invalid due date | `400` | `Due date must be a valid date in YYYY-MM-DD format.` |
 | Todo deleted | `200` | `Todo deleted successfully.` |
 | Empty profile first name | `400` | `First name is required.` |
 | Empty profile last name | `400` | `Last name is required.` |
@@ -120,3 +122,4 @@ The password hash is never included.
 | List CRUD, owner-scoped `GET /todo/lists` | Feature 2 |
 | Todo CRUD under an owned list | Feature 3 |
 | Self-only profile read and update | Feature 4 |
+| Optional todo `dueDate` | Feature 5 |

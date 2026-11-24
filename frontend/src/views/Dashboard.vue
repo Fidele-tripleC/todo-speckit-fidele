@@ -2,6 +2,7 @@
 import { onMounted, ref } from "vue";
 import listServices from "../services/listServices.js";
 import todoServices from "../services/todoServices.js";
+import { formatDueDate, isTodoOverdue, optionalDueDateRules, toDateInputValue } from "../config/validation.js";
 
 const lists = ref([]);
 const loading = ref(false);
@@ -35,7 +36,9 @@ const todosError = ref("");
 const addItemForm = ref(null);
 const editItemForm = ref(null);
 const newTodoTitle = ref("");
+const newTodoDueDate = ref("");
 const editTodoTitle = ref("");
+const editTodoDueDate = ref("");
 const todoToEdit = ref(null);
 const todoToDelete = ref(null);
 const addItemLoading = ref(false);
@@ -180,6 +183,7 @@ const openItemsDialog = async (list) => {
 
 const openAddItemDialog = () => {
   newTodoTitle.value = "";
+  newTodoDueDate.value = "";
   itemDialogError.value = "";
   addItemDialogOpen.value = true;
 };
@@ -195,10 +199,13 @@ const handleAddItem = async () => {
   addItemLoading.value = true;
 
   try {
-    const response = await todoServices.createTodo(activeList.value.id, newTodoTitle.value.trim());
+    const response = newTodoDueDate.value
+      ? await todoServices.createTodo(activeList.value.id, newTodoTitle.value.trim(), newTodoDueDate.value)
+      : await todoServices.createTodo(activeList.value.id, newTodoTitle.value.trim());
     todos.value = sortTodos([...todos.value, response.data]);
     addItemDialogOpen.value = false;
     newTodoTitle.value = "";
+    newTodoDueDate.value = "";
   } catch (error) {
     itemDialogError.value = error.response?.data?.message || "Failed to add todo.";
   } finally {
@@ -222,6 +229,7 @@ const toggleCompleted = async (todo, completed) => {
 const openEditItemDialog = (todo) => {
   todoToEdit.value = todo;
   editTodoTitle.value = todo.title;
+  editTodoDueDate.value = toDateInputValue(todo.dueDate);
   itemDialogError.value = "";
   editItemDialogOpen.value = true;
 };
@@ -239,6 +247,7 @@ const handleEditItem = async () => {
   try {
     const response = await todoServices.updateTodo(todoToEdit.value.id, {
       title: editTodoTitle.value.trim(),
+      dueDate: editTodoDueDate.value || null,
     });
     todos.value = sortTodos(
       todos.value.map((item) => (item.id === response.data.id ? response.data : item))
@@ -413,6 +422,11 @@ onMounted(loadLists);
               <v-list-item-title :class="{ 'text-decoration-line-through text-medium-emphasis': todo.completed }">
                 {{ todo.title }}
               </v-list-item-title>
+              <v-list-item-subtitle v-if="todo.dueDate">
+                <span :class="{ 'text-error': isTodoOverdue(todo) }">
+                  Due {{ formatDueDate(todo.dueDate) }}
+                </span>
+              </v-list-item-subtitle>
               <template #append>
                 <v-btn
                   icon="mdi-pencil"
@@ -445,6 +459,12 @@ onMounted(loadLists);
         <v-card-text>
           <v-form ref="addItemForm" @submit.prevent="handleAddItem">
             <v-text-field v-model="newTodoTitle" label="Todo title" :rules="todoTitleRules" />
+            <v-text-field
+              v-model="newTodoDueDate"
+              label="Due date"
+              type="date"
+              :rules="optionalDueDateRules"
+            />
             <v-alert v-if="itemDialogError && addItemDialogOpen" type="error" class="mt-2">
               {{ itemDialogError }}
             </v-alert>
@@ -472,6 +492,13 @@ onMounted(loadLists);
         <v-card-text>
           <v-form ref="editItemForm" @submit.prevent="handleEditItem">
             <v-text-field v-model="editTodoTitle" label="Todo title" :rules="todoTitleRules" />
+            <v-text-field
+              v-model="editTodoDueDate"
+              label="Due date"
+              type="date"
+              :rules="optionalDueDateRules"
+              clearable
+            />
             <v-alert v-if="itemDialogError && editItemDialogOpen" type="error" class="mt-2">
               {{ itemDialogError }}
             </v-alert>

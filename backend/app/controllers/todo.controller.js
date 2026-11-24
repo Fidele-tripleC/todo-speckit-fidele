@@ -1,5 +1,6 @@
 import db from "../models/index.js";
 import logger from "../config/logger.js";
+import { parseDueDateInput } from "../utils/dueDate.js";
 import {
   getAccessibleListOrNull,
   getAccessibleTodoOrNull,
@@ -63,11 +64,17 @@ exports.create = async (req, res) => {
       return res.status(400).send({ message: error });
     }
 
+    const parsedDueDate = parseDueDateInput(req.body.dueDate);
+    if (parsedDueDate.error) {
+      return res.status(400).send({ message: parsedDueDate.error });
+    }
+
     const todo = await db.todo.create({
       listId: list.id,
       title: req.body.title.trim(),
       completed: false,
       userId: req.user.id,
+      dueDate: parsedDueDate.provided ? parsedDueDate.value : null,
     });
 
     return res.status(201).send(todo);
@@ -100,6 +107,15 @@ exports.update = async (req, res) => {
 
     if (req.body.completed !== undefined) {
       todo.completed = Boolean(req.body.completed);
+    }
+
+    if (req.body.dueDate !== undefined) {
+      const parsedDueDate = parseDueDateInput(req.body.dueDate);
+      if (parsedDueDate.error) {
+        return res.status(400).send({ message: parsedDueDate.error });
+      }
+
+      todo.dueDate = parsedDueDate.value;
     }
 
     await todo.save();

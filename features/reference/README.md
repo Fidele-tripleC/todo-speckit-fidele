@@ -33,3 +33,4 @@ They do **not** authorize new scope — implement only from `features/feature-*.
 | Lists and the dashboard lists view | Feature 2 |
 | Todos and the list-items dialog | Feature 3 |
 | Profile menu and `GET`/`PUT /todo/users/:id` | Feature 4 |
+| Todo due dates | Feature 5 |

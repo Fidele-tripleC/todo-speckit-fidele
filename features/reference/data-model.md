@@ -1,6 +1,6 @@
 # Data Model Reference
 
-**Status:** Feature 1 users and sessions. Feature 2 lists. Feature 3 todos. Feature 4 edits the existing `users` row.
+**Status:** Feature 1 users and sessions. Feature 2 lists. Feature 3 todos. Feature 4 edits the existing `users` row. Feature 5 adds `todos.dueDate`.
 
 ## Tables
 
@@ -44,6 +44,7 @@
 | `listId` | INTEGER FK | Required; references `lists.id`; list delete cascades |
 | `title` | STRING(255) | Required; trimmed; max 255 characters |
 | `completed` | BOOLEAN | Required; default `false` |
+| `dueDate` | DATEONLY | Nullable; optional calendar date `YYYY-MM-DD` |
 | `userId` | INTEGER FK | Required; references `users.id`; set from the signed-in user on create |
 | `createdAt` | DATE | Sequelize timestamp |
 | `updatedAt` | DATE | Sequelize timestamp |
@@ -66,4 +67,5 @@
 | `users`, `sessions` | Feature 1 |
 | `lists` | Feature 2 |
 | `todos` | Feature 3 |
+| `todos.dueDate` | Feature 5 |
 | Profile edits on `users` (no new table) | Feature 4 |
