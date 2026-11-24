@@ -1,15 +1,58 @@
 # API Reference
 
-**Status:** empty starter — no application endpoints yet.
+**Status:** Feature 1 authentication is implemented. Lists and todos are not stored yet.
 
-API mount path defaults to `/api` (see `backend/server.js`). Update this file when endpoints merge to `dev`.
+Base path: `/todo/`.
+
+Authenticated routes require `Authorization: Bearer <token>`.
 
 ## Endpoints
 
-*(none)*
+| Method | Path | Auth | Purpose |
+|--------|------|------|---------|
+| `POST` | `/todo/register` | No | Create an account and session |
+| `POST` | `/todo/login` | No | Sign in with username and password |
+| `POST` | `/todo/logout` | Yes | Invalidate the current session token |
+| `GET` | `/todo/lists` | Yes | Return the signed-in user's lists |
 
-## Conventions
+`GET /todo/lists` returns `[]` until Feature 2 stores lists. It does not return another user's data.
 
-- Flat JSON responses (no `{ success, data }` envelope).
-- Errors: `{ "message": "..." }`.
-- Authenticated routes: `Authorization: Bearer <token>` (when Feature auth is implemented).
+## Auth success payload
+
+`POST /todo/register` returns `201`. `POST /todo/login` returns `200`.
+
+```json
+{
+  "userId": 1,
+  "username": "jdoe",
+  "email": "jdoe@example.com",
+  "fName": "Jane",
+  "lName": "Doe",
+  "role": "worker",
+  "token": "<jwt>"
+}
+```
+
+The password hash is never included.
+
+## Errors
+
+`{ "message": "Human-readable explanation." }`
+
+| Situation | Status | Message |
+|-----------|--------|---------|
+| Missing required registration or login field | `400` | Field-specific required message |
+| Password shorter than 8 characters | `400` | `Password must be at least 8 characters.` |
+| Duplicate username | `400` | `Username is already taken.` |
+| Duplicate email | `400` | `Email is already registered.` |
+| Wrong username or password | `401` | `Invalid username or password.` |
+| Missing bearer token | `401` | `Unauthorized! No token provided.` |
+| Expired or revoked token | `401` | `Unauthorized! Invalid or expired token.` |
+| Sign out | `200` | `Signed out successfully.` |
+
+## Feature provenance
+
+| Area | Introduced |
+|------|------------|
+| Register, login, logout, session token | Feature 1 |
+| `GET /todo/lists` auth gate (empty until lists exist) | Feature 1 |
